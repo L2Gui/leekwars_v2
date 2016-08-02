@@ -61,6 +61,7 @@ LW.on('pageload', function()
         var removeChipHeal = localStorage['removeChipHeal'] === undefined ? true : (localStorage['removeChipHeal'] === 'true');
         var removeSay = localStorage['removeSay'] === undefined ? false : (localStorage['removeSay'] === 'true');
         var addSlowMotion = localStorage['addSlowMotion'] === undefined ? false : (localStorage['addSlowMotion'] === 'true');
+        var addWastedScreen = localStorage['addWastedScreen'] === undefined ? false : (localStorage['addWastedScreen'] === 'true');
 
         $('body').on('click', '#remove_animation_apply', function () {
 			var removeGas = $('#removeGas').is(':checked');
@@ -81,27 +82,32 @@ LW.on('pageload', function()
         	localStorage['removeSay'] = removeSay;
             var addSlowMotion = $('#addSlowMotion').is(':checked');
         	localStorage['addSlowMotion'] = addSlowMotion;
+            var addWastedScreen = $('#addWastedScreen').is(':checked');
+            localStorage['addWastedScreen'] = addWastedScreen;
         	_.toast('Paramètres sauvegardés !');
         });
 
-	    $('#settings-page .flex-container').first().append('<div class="column6"><div class="panel"><div class="header"><h2>Suppression animation</h2></div>'
-        +'<div class="content" style="text-align: left;">'
-        + '<h3>Des choses en moins</h3>'
-        + '<p>'
-        + '<input type="checkbox" class="category-checkbox" id="removeGas"> <label for="removeGas" class="category-title">Gas</label><br/>'
-        + '<input type="checkbox" id="removeFire"> <label for="removeFire" class="category-title">Feu</label><br/>'
-        + '<input type="checkbox" id="removeExplosion"> <label for="removeExplosion" class="category-title">Explosion</label><br>'
-        + '<input type="checkbox" id="removeChipHalo"> <label for="removeChipHalo" class="category-title">Chip halo (animation autour du leek)</label><br>'
-        + '<input type="checkbox" id="removeChipImage"> <label for="removeChipImage" class="category-title">Chip image (image de la puce au dessus du leek)</label><br>'
-        + '<input type="checkbox" id="removeChipAureol"> <label for="removeChipAureol" class="category-title">Chip aureol (croix au dessus du leek) </label><br>'
-        + '<input type="checkbox" id="removeChipHeal"> <label for="removeChipHeal" class="category-title">Chip heal (animation verte quand on soigne un leek)</label><br>'
-        + '<input type="checkbox" id="removeSay"> <label for="removeSay" class="category-title">Say</label><br>'
-        + '</p>'
-        + '<h3>Des choses en plus</h3>'
-        + '<p>'
-        + '<input type="checkbox" id="addSlowMotion"> <label for="addSlowMotion" class="category-title">Slow Motion (ajoute un ralenti sur les kills)</label><br>'
-        + '</p>'
-        + '<br><br><center><div class="button green" id="remove_animation_apply">Appliquer</div></center></div></div></div>');
+        $('#settings-page .flex-container').first().append('<div class="column6"><div class="panel"><div class="header"><h2>Suppression animation</h2></div>'
+            +'<div class="content" style="text-align: left;">'
+            + '<h3>Des choses en moins</h3>'
+            + '<br/>'
+            + '<input type="checkbox" class="category-checkbox" id="removeGas"> <label for="removeGas" class="category-title">Gas</label><br/>'
+            + '<input type="checkbox" id="removeFire"> <label for="removeFire" class="category-title">Feu</label><br/>'
+            + '<input type="checkbox" id="removeExplosion"> <label for="removeExplosion" class="category-title">Explosion</label><br>'
+            + '<input type="checkbox" id="removeChipHalo"> <label for="removeChipHalo" class="category-title">Chip halo (animation autour du leek)</label><br>'
+            + '<input type="checkbox" id="removeChipImage"> <label for="removeChipImage" class="category-title">Chip image (image de la puce au dessus du leek)</label><br>'
+            + '<input type="checkbox" id="removeChipAureol"> <label for="removeChipAureol" class="category-title">Chip aureol (croix au dessus du leek) </label><br>'
+            + '<input type="checkbox" id="removeChipHeal"> <label for="removeChipHeal" class="category-title">Chip heal (animation verte quand on soigne un leek)</label><br>'
+            + '<input type="checkbox" id="removeSay"> <label for="removeSay" class="category-title">Say</label><br>'
+
+            + '<h3>Des choses en plus</h3>'
+            + '<br/>'
+            + '<input type="checkbox" id="addSlowMotion" category="slowMotion"> <label for="addSlowMotion" class="category-title">Slow Motion (ajoute un ralenti sur les kills)</label><br>'
+            + '<div class="category off" category="slowMotion" style="padding-left: 18px">'
+            + '<input type="checkbox" id="addWastedScreen" category="slowMotion"> <label for="addWastedScreen" class="category-title">"Wasted" affiché en plus du slow motion</label><br>'
+            + '</div>'
+
+            + '<br><br><center><div class="button green" id="remove_animation_apply">Appliquer</div></center></div></div></div>');
 
     	$('#removeGas').prop('checked', removeGas);
     	$('#removeFire').prop('checked', removeFire);
@@ -112,6 +118,7 @@ LW.on('pageload', function()
     	$('#removeChipHeal').prop('checked', removeChipHeal);
     	$('#removeSay').prop('checked', removeSay);
     	$('#addSlowMotion').prop('checked', addSlowMotion);
+        $('#addWastedScreen').prop('checked', addWastedScreen);
     }
 
 	if (LW.currentPage == 'fight')
@@ -125,6 +132,7 @@ LW.on('pageload', function()
         var removeChipHeal = localStorage['removeChipHeal'] === undefined ? true : (localStorage['removeChipHeal'] === 'true');
         var removeSay = localStorage['removeSay'] === undefined ? false : (localStorage['removeSay'] === 'true');
         var addSlowMotion = localStorage['addSlowMotion'] === undefined ? false : (localStorage['addSlowMotion'] === 'true');
+        var addWastedScreen = localStorage['addWastedScreen'] === undefined ? false : (localStorage['addWastedScreen'] === 'true');
 
 
 		var initInt = setInterval(function()
@@ -177,54 +185,58 @@ LW.on('pageload', function()
 					var slowMotionActions = getSlowMotionActions();										
                     interceptFunction(game, "doAction", {
                         before: function(action){
-                            if (inArray(game.currentAction, slowMotionActions)){ 
-                                var gameDiv = document.getElementById("layers");
-                                var wasted;
-                                var bgCanvas = document.getElementById("bg-canvas");
-                                var gameCanvas = document.getElementById("game-canvas");
-                                if(gameDiv.lastChild["isWastedScreen"] === true){
-                                    //wasted déjà créé
-                                    wasted = gameDiv.lastChild;
-                                }else{
-                                    //besoin de crééer la div wasted
-                                    wasted = document.createElement("div");
-                                    wasted["isWastedScreen"] = true;
-                                    wasted.style.textAlign = "center";
-                                    wasted.style.position = "absolute";
-                                    wasted.style.top = "0";
-                                    wasted.style.left = "0";
-                                    wasted.style.height = "100%";
-                                    wasted.style.width = "100%";
-                                    wasted.style.backgroundImage = "url(https://i.imgur.com/JN1rYNl.png)";
-                                    wasted.style.backgroundSize = "auto 100%";
-                                    wasted.style.backgroundPosition = "center";
-                                    wasted.style.backgroundRepeat = "no-repeat";
-                                    wasted.style.transition = "all 1s";
-                                    gameDiv.appendChild(wasted);
-                                    // ajoute une transition sur les canvas
-                                    bgCanvas.style.transition = "all 500ms";
-                                    gameCanvas.style.transition = "all 500ms";
+                            if (inArray(game.currentAction, slowMotionActions)){
+                                if(addWastedScreen) {
+                                    var gameDiv = document.getElementById("layers");
+                                    var wasted;
+                                    var bgCanvas = document.getElementById("bg-canvas");
+                                    var gameCanvas = document.getElementById("game-canvas");
+                                    if (gameDiv.lastChild["isWastedScreen"] === true) {
+                                        //wasted déjà créé
+                                        wasted = gameDiv.lastChild;
+                                    } else {
+                                        //besoin de crééer la div wasted
+                                        wasted = document.createElement("div");
+                                        wasted["isWastedScreen"] = true;
+                                        wasted.style.textAlign = "center";
+                                        wasted.style.position = "absolute";
+                                        wasted.style.top = "0";
+                                        wasted.style.left = "0";
+                                        wasted.style.height = "100%";
+                                        wasted.style.width = "100%";
+                                        wasted.style.backgroundImage = "url(https://i.imgur.com/JN1rYNl.png)";
+                                        wasted.style.backgroundSize = "auto 100%";
+                                        wasted.style.backgroundPosition = "center";
+                                        wasted.style.backgroundRepeat = "no-repeat";
+                                        wasted.style.transition = "all 1s";
+                                        gameDiv.appendChild(wasted);
+                                        // ajoute une transition sur les canvas
+                                        bgCanvas.style.transition = "all 500ms";
+                                        gameCanvas.style.transition = "all 500ms";
+                                    }
+
+                                    wasted.style.opacity = "1";
+                                    wasted.style.display = "block";
+                                    bgCanvas.style["-webkit-filter"] = "grayscale(100%)";
+                                    bgCanvas.style.filter = "grayscale(100%)";
+                                    gameCanvas.style["-webkit-filter"] = "grayscale(100%)";
+                                    gameCanvas.style.filter = "grayscale(100%)";
                                 }
-                                
-                                wasted.style.opacity="1";
-                                wasted.style.display = "block";
-                                bgCanvas.style["-webkit-filter"] = "grayscale(100%)";
-                                bgCanvas.style.filter = "grayscale(100%)";
-                                gameCanvas.style["-webkit-filter"] = "grayscale(100%)";
-                                gameCanvas.style.filter = "grayscale(100%)";
                                 var oldGameSpeed = game.speed;
                                 game.speed = 0.1;
                                 
                                 setTimeout(function(){
                                     game.speed = oldGameSpeed;
-                                    wasted.style.opacity="0";
-                                    bgCanvas.style["-webkit-filter"] = "none";
-                                    bgCanvas.style.filter = "none";
-                                    gameCanvas.style["-webkit-filter"] = "none";
-                                    gameCanvas.style.filter = "none";
-                                    setTimeout(function(){
-                                        wasted.style.display = "none";
-                                    }, 500);
+                                    if(addWastedScreen) {
+                                        wasted.style.opacity = "0";
+                                        bgCanvas.style["-webkit-filter"] = "none";
+                                        bgCanvas.style.filter = "none";
+                                        gameCanvas.style["-webkit-filter"] = "none";
+                                        gameCanvas.style.filter = "none";
+                                        setTimeout(function(){
+                                            wasted.style.display = "none";
+                                        }, 500);
+                                    }
                                 }, 1000); // 1 seconde de slow motion. faire un param ?
                             }
                         }
